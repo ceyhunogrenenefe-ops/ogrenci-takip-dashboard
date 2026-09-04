@@ -1,18 +1,14 @@
 {
   "name": "ogrenci-takip-dashboard",
   "version": "1.0.0",
-  "description": "WhatsApp entegrasyonlu öğrenci takip dashboard'ı",
-  "main": "api/send-message.js",
+  "description": "CRM Dashboard for Student Management",
+  "main": "api/webhook.js",
   "scripts": {
     "dev": "vercel dev",
-    "deploy": "vercel"
+    "build": "echo 'Static build'"
   },
-  "dependencies": {
-    "express": "^4.18.2",
-    "cors": "^2.8.5",
-    "node-fetch": "^2.6.11"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "vercel": "^33.0.0"
+    "@vercel/node": "latest"
   }
 }
