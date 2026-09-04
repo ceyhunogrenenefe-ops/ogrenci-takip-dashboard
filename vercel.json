@@ -2,6 +2,5 @@
   "buildCommand": "npm install",
   "env": {
     "WHATSAPP_TOKEN": "@whatsapp_token"
-  },
-  "public": true
+  }
 }
