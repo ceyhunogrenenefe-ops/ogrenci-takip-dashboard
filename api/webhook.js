@@ -1,25 +1,29 @@
 // api/webhook.js - WhatsApp Webhook Handler
 export default async function handler(req, res) {
-    // CORS Headers
+    // CORS
     res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
     res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
 
-    // Verification token (Meta tarafından gönderilen)
     const VERIFY_TOKEN = process.env.WHATSAPP_VERIFY_TOKEN || "123456";
 
-    // GET - Webhook Doğrulama (Facebook'tan)
+    // GET - Webhook Verification (Facebook tarafından)
     if (req.method === 'GET') {
         const mode = req.query['hub.mode'];
         const token = req.query['hub.verify_token'];
         const challenge = req.query['hub.challenge'];
 
+        console.log('🔍 Webhook Verification:', { mode, token, challenge });
+
         if (mode === 'subscribe' && token === VERIFY_TOKEN) {
-            console.log('✅ Webhook verified');
-            return res.status(200).send(challenge);
+            console.log('✅ Webhook verified successfully');
+            res.status(200).send(challenge);
+            return;
         } else {
-            return res.status(403).json({ error: 'Forbidden' });
+            console.log('❌ Token mismatch or invalid mode');
+            res.status(403).json({ error: 'Forbidden' });
+            return;
         }
     }
 
@@ -27,35 +31,56 @@ export default async function handler(req, res) {
     if (req.method === 'POST') {
         const body = req.body;
 
-        // Meta gönderdiği format
+        console.log('📨 Webhook received:', JSON.stringify(body, null, 2));
+
+        // Meta format control
         if (body.object === 'whatsapp_business_account') {
-            const changes = body.entry?.[0]?.changes?.[0]?.value;
+            const entry = body.entry?.[0];
+            const changes = entry?.changes?.[0];
+            const value = changes?.value;
 
-            if (changes?.messages) {
-                changes.messages.forEach(msg => {
+            // Gelen mesajlar
+            if (value?.messages) {
+                value.messages.forEach(msg => {
                     const from = msg.from;
-                    const text = msg.text?.body || '';
+                    const text = msg.text?.body || '[Media]';
                     const timestamp = msg.timestamp;
+                    const messageId = msg.id;
 
-                    // Bu mesajı backend'e kaydet veya veritabanına gönder
-                    console.log(`📨 Gelen Mesaj: ${from} → ${text}`);
+                    console.log('💬 Incoming Message:', { from, text, timestamp });
 
-                    // Örnek: Redis/Database'ye kaydet
-                    // saveIncomingMessage(from, text, timestamp);
+                    // Backend'e kaydet (REST API veya database)
+                    // Örnek: saveMessage(from, text, timestamp);
                 });
             }
 
-            // Status güncelleme
-            if (changes?.statuses) {
-                changes.statuses.forEach(status => {
-                    console.log(`📤 Mesaj Status: ${status.id} → ${status.status}`);
+            // Mesaj status güncellemeleri
+            if (value?.statuses) {
+                value.statuses.forEach(status => {
+                    console.log('📤 Message Status:', {
+                        id: status.id,
+                        status: status.status,
+                        timestamp: status.timestamp
+                    });
                 });
             }
 
-            return res.status(200).json({ received: true });
+            // Kontaktlar
+            if (value?.contacts) {
+                value.contacts.forEach(contact => {
+                    console.log('👤 Contact:', contact);
+                });
+            }
+
+            // Pozitif response gönder (Facebook webhook doğrulaması için)
+            res.status(200).json({ received: true });
+            return;
         }
 
-        return res.status(400).json({ error: 'Invalid format' });
+        // Unknown format
+        console.log('⚠️ Unknown webhook format');
+        res.status(200).json({ received: true });
+        return;
     }
 
     if (req.method === 'OPTIONS') {
