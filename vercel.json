@@ -1,7 +1,4 @@
 {
-  "env": {
-    "WHATSAPP_TOKEN": "@whatsapp_token"
-  },
   "buildCommand": "",
-  "outputDirectory": "public"
+  "outputDirectory": "."
 }
