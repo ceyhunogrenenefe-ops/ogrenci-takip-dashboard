@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Öğrenci Takip Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f5f7fa; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 25px; text-align: center; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .status { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .status-ok { color: #27ae60; font-size: 18px; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-top: 20px; }
+        th { background: #f8f9fa; padding: 12px; text-align: left; font-weight: 600; border-bottom: 2px solid #e9ecef; }
+        td { padding: 12px; border-bottom: 1px solid #eee; }
+        tr:hover { background: #f8f9fa; }
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .badge-ok { background: #d4edda; color: #155724; }
+        .badge-pending { background: #fff3cd; color: #856404; }
+        button { padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; }
+        button:hover { background: #5568d3; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📚 Öğrenci Takip Dashboard</h1>
+        <p>Vercel + WhatsApp Entegrasyonu</p>
+    </div>
+
+    <div class="container">
+        <div class="status">
+            <div class="status-ok">✅ DASHBOARD ÇALIŞIYOR!</div>
+            <p style="margin-top: 10px; color: #666;">
+                Vercel'de başarıyla deploy edildi.
+                <br>WhatsApp API endpoint'i hazır.
+                <br>624 öğrenci verisini yönetmeye başla!
+            </p>
+        </div>
+
+        <h2 style="margin-top: 30px; color: #333;">📊 Sistem Bilgileri</h2>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Bileşen</th>
+                    <th>Durum</th>
+                    <th>Detay</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Frontend Dashboard</td>
+                    <td><span class="badge badge-ok">✅ Aktif</span></td>
+                    <td>HTML + JavaScript</td>
+                </tr>
+                <tr>
+                    <td>Vercel Deploy</td>
+                    <td><span class="badge badge-ok">✅ Aktif</span></td>
+                    <td>Static site hosting</td>
+                </tr>
+                <tr>
+                    <td>WhatsApp API</td>
+                    <td><span class="badge badge-pending">⏳ Konfigüre Beklemede</span></td>
+                    <td>API endpoint hazır, token ekle</td>
+                </tr>
+                <tr>
+                    <td>Öğrenci Veritabanı</td>
+                    <td><span class="badge badge-ok">✅ Hazır</span></td>
+                    <td>624 öğrenci, localStorage</td>
+                </tr>
+                <tr>
+                    <td>GitHub Repo</td>
+                    <td><span class="badge badge-ok">✅ Bağlı</span></td>
+                    <td>ceyhunogrenenefe-ops/ogrenci-takip-dashboard</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2 style="margin-top: 30px; color: #333;">🚀 Sonraki Adımlar</h2>
+        <div style="background: white; padding: 20px; border-radius: 8px; margin-top: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <ol style="line-height: 2; color: #333;">
+                <li><strong>GitHub Repo</strong>: Tüm kod ve ayarlar GitHub'da
+                    <br><code style="background: #f0f0f0; padding: 2px 6px; border-radius: 3px;">https://github.com/ceyhunogrenenefe-ops/ogrenci-takip-dashboard</code>
+                </li>
+                <li><strong>Vercel Settings</strong>: WhatsApp Token'ı ekle
+                    <br>Settings → Environment Variables → WHATSAPP_TOKEN = (senin token)
+                </li>
+                <li><strong>Dashboard</strong>: Aşağıdaki butona tıkla tam dashboard'a erişmek için
+                </li>
+            </ol>
+        </div>
+
+        <div style="text-align: center; margin-top: 40px;">
+            <button onclick="loadFullDashboard()">📊 Tam Dashboard'a Gir</button>
+        </div>
+
+        <div id="info" style="background: #e7f0ff; padding: 15px; border-radius: 8px; margin-top: 30px; border-left: 4px solid #667eea; color: #333;">
+            <strong>💡 Bilgi:</strong> Tam dashboard HTML dosyası (148 KB) GitHub repo'sunda bulunuyor.
+            <br>Tam dashboard'a erişmek istersen yukarıdaki butona tıkla veya:
+            <br><code style="background: white; padding: 2px 6px; border-radius: 3px;">https://github.com/ceyhunogrenenefe-ops/ogrenci-takip-dashboard/blob/main/public/index.html</code>
+        </div>
+    </div>
+
+    <script>
+        function loadFullDashboard() {
+            // GitHub raw link'i açabiliriz veya fetch yapabiliriz
+            alert('🔄 Tam dashboard yükleniyor...\n\nGitHub repo\'dan full HTML dosyasını indirmek için:\nhttps://raw.githubusercontent.com/ceyhunogrenenefe-ops/ogrenci-takip-dashboard/main/public/index.html');
+            
+            // Veya direkt GitHub'dan yükle
+            window.location.href = 'https://raw.githubusercontent.com/ceyhunogrenenefe-ops/ogrenci-takip-dashboard/main/public/index.html';
+        }
+    </script>
+</body>
+</html>
