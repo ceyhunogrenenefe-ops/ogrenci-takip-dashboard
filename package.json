@@ -1,14 +1,14 @@
 {
   "name": "ogrenci-takip-dashboard",
   "version": "1.0.0",
-  "description": "CRM Dashboard for Student Management",
-  "main": "api/webhook.js",
+  "private": true,
+  "description": "CRM Dashboard for Student Management + WhatsApp",
   "scripts": {
     "dev": "vercel dev",
-    "build": "echo 'Static build'"
+    "deploy": "vercel deploy --prod --yes"
   },
   "dependencies": {},
   "devDependencies": {
-    "@vercel/node": "latest"
+    "@vercel/node": "^5.1.8"
   }
 }
