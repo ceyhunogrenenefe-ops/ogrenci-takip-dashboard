@@ -53,3 +53,4 @@ WhatsApp mesaj gönder.
 ✅ Durumları Takip
 ✅ Excel Export
 ✅ localStorage Desteği
+# Build: Fri Sep  4 09:56:41 UTC 2026
