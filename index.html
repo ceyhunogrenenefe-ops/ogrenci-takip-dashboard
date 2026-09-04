@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Durum Yönetimi</title>
+    <title>Dashboard - Durum & WhatsApp Mesajlaşma</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', sans-serif; background: #f5f7fa; }
@@ -11,27 +11,27 @@
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 20px;
+            padding: 15px 20px;
             position: sticky;
             top: 0;
             z-index: 100;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
         
-        .header-content { max-width: 1600px; margin: 0 auto; }
-        .header h1 { font-size: 28px; margin-bottom: 10px; }
+        .header h1 { font-size: 24px; margin-bottom: 8px; }
+        .header-info { font-size: 12px; opacity: 0.9; }
         
         .container {
             display: flex;
-            max-width: 1600px;
+            max-width: 1800px;
             margin: 0 auto;
             gap: 15px;
             padding: 15px;
-            height: calc(100vh - 120px);
+            height: calc(100vh - 100px);
         }
         
         .sidebar {
-            width: 280px;
+            width: 300px;
             background: white;
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
@@ -47,7 +47,7 @@
             padding-bottom: 15px;
         }
         
-        .sidebar-title { font-weight: 600; font-size: 13px; color: #667eea; text-transform: uppercase; margin-bottom: 10px; }
+        .sidebar-title { font-weight: 600; font-size: 12px; color: #667eea; text-transform: uppercase; margin-bottom: 10px; }
         
         .filter-input, .filter-select {
             width: 100%;
@@ -58,7 +58,7 @@
             margin-bottom: 8px;
         }
         
-        .filter-btn {
+        .btn {
             width: 100%;
             padding: 8px;
             background: #667eea;
@@ -68,79 +68,48 @@
             cursor: pointer;
             font-size: 12px;
             font-weight: 600;
+            transition: all 0.2s;
         }
         
-        .filter-btn:hover { background: #5568d3; }
+        .btn:hover { background: #5568d3; }
+        .btn-whatsapp { background: #25d366; }
+        .btn-whatsapp:hover { background: #1fb858; }
+        .btn-instagram { background: #E1306C; }
         
-        .ad-box {
-            background: linear-gradient(135deg, #25d366 0%, #1fb858 100%);
-            color: white;
-            padding: 12px;
-            border-radius: 6px;
-            font-size: 12px;
-            text-align: center;
-        }
-        
-        .ad-box strong { display: block; margin-bottom: 6px; }
-        
-        .ad-btn {
-            background: white;
-            color: #25d366;
-            padding: 6px 12px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 11px;
-            margin-top: 8px;
-            width: 100%;
-        }
+        .stat { font-size: 12px; margin: 6px 0; display: flex; justify-content: space-between; }
+        .stat-val { font-weight: 600; color: #667eea; }
         
         .main-content {
             flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
         }
         
-        .top-bar {
+        .top-controls {
             display: flex;
             gap: 10px;
             justify-content: space-between;
             align-items: center;
-        }
-        
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-        }
-        
-        .stat-card {
             background: white;
             padding: 12px;
-            border-radius: 6px;
-            text-align: center;
+            border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
         
-        .stat-value { font-size: 24px; font-weight: bold; color: #667eea; }
-        .stat-label { font-size: 11px; color: #666; margin-top: 4px; }
-        
-        .tab-buttons {
+        .tab-btns {
             display: flex;
-            gap: 10px;
+            gap: 8px;
         }
         
         .tab-btn {
-            padding: 8px 16px;
+            padding: 6px 12px;
             background: white;
             border: 2px solid #ddd;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
-            transition: all 0.2s;
         }
         
         .tab-btn.active {
@@ -149,33 +118,43 @@
             border-color: #667eea;
         }
         
-        .cards-container {
+        .content-area {
             flex: 1;
+            display: flex;
+            gap: 12px;
+            overflow: hidden;
+        }
+        
+        .panel {
             background: white;
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             padding: 15px;
             overflow-y: auto;
+            display: flex;
+            flex-direction: column;
         }
+        
+        .panel-title { font-weight: 600; font-size: 13px; margin-bottom: 12px; color: #333; }
         
         .cards-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 12px;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
         }
         
         .card {
-            background: linear-gradient(135deg, #f8f9fa 0%, #f0f1fa 100%);
+            background: #f8f9fa;
             border: 2px solid #e9ecef;
-            border-radius: 8px;
-            padding: 12px;
+            border-radius: 6px;
+            padding: 10px;
             cursor: pointer;
             transition: all 0.2s;
         }
         
         .card:hover {
             border-color: #667eea;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
             transform: translateY(-2px);
         }
         
@@ -184,80 +163,120 @@
         .card.pending { background: #fff3cd; border-color: #ffc107; }
         .card.no-contact { background: #f8d7da; border-color: #dc3545; }
         
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: start;
-            margin-bottom: 8px;
+        .card-name { font-weight: 600; font-size: 12px; margin-bottom: 4px; }
+        .card-info { font-size: 10px; color: #666; line-height: 1.4; margin: 6px 0; padding: 6px; background: rgba(255,255,255,0.6); border-radius: 3px; }
+        .card-badge { display: inline-block; padding: 2px 6px; border-radius: 10px; font-size: 9px; background: rgba(0,0,0,0.1); margin-top: 6px; }
+        
+        .right-panel { width: 350px; }
+        
+        .templates {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
         }
         
-        .card-name { font-weight: 600; font-size: 13px; color: #333; }
-        .card-class { font-size: 10px; color: #666; margin-top: 2px; }
-        
-        .card-info {
-            font-size: 11px;
-            color: #555;
-            margin: 8px 0;
+        .template-btn {
+            background: #f0f0f0;
+            border: 1px solid #ddd;
             padding: 8px;
-            background: rgba(255,255,255,0.5);
-            border-radius: 4px;
-            line-height: 1.4;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 11px;
+            text-align: left;
+            transition: all 0.2s;
         }
         
-        .card-info strong { display: block; color: #333; }
+        .template-btn:hover {
+            background: #e0e0e0;
+            border-color: #25d366;
+        }
         
-        .status-badge {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 12px;
+        .template-btn.selected {
+            background: #25d366;
+            color: white;
+            border-color: #25d366;
+        }
+        
+        .message-preview {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            font-size: 11px;
+            margin: 10px 0;
+            min-height: 60px;
+            color: #333;
+        }
+        
+        .incoming-msgs {
+            background: #e7f5ff;
+            padding: 10px;
+            border-radius: 5px;
             font-size: 10px;
-            font-weight: 600;
-            background: rgba(0,0,0,0.1);
-        }
-        
-        .instagram-panel {
-            width: 320px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            padding: 15px;
+            max-height: 150px;
             overflow-y: auto;
         }
         
-        .instagram-title { font-weight: 600; font-size: 14px; color: #E1306C; margin-bottom: 12px; }
-        
-        .instagram-msg {
-            background: #f8f9fa;
-            padding: 10px;
-            border-radius: 6px;
-            margin-bottom: 10px;
-            font-size: 11px;
-            border-left: 3px solid #E1306C;
+        .msg-item {
+            background: white;
+            padding: 8px;
+            border-radius: 4px;
+            margin-bottom: 6px;
+            border-left: 3px solid #25d366;
         }
         
-        .instagram-from { font-weight: 600; color: #333; }
-        .instagram-text { color: #666; margin-top: 4px; }
+        .msg-from { font-weight: 600; color: #25d366; }
+        .msg-text { color: #666; margin-top: 2px; }
+        .msg-time { font-size: 9px; color: #999; margin-top: 2px; }
         
-        @media (max-width: 1200px) {
+        .send-section {
+            background: #f0f8ff;
+            border: 2px solid #667eea;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+        
+        .send-info { font-size: 10px; color: #333; margin-bottom: 8px; }
+        .send-info strong { color: #667eea; }
+        
+        .status-filter {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+            font-size: 10px;
+        }
+        
+        .status-filter label {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+        
+        .status-filter input { width: 14px; height: 14px; cursor: pointer; }
+        
+        @media (max-width: 1400px) {
             .container { flex-direction: column; height: auto; }
-            .sidebar { width: 100%; max-height: 150px; }
-            .instagram-panel { width: 100%; }
+            .sidebar { width: 100%; max-height: 120px; }
+            .right-panel { width: 100%; }
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <div class="header-content">
-            <h1>📊 Durum Yönetimi Dashboard</h1>
+        <h1>📊 Dashboard + 💬 WhatsApp Mesajlaşma</h1>
+        <div class="header-info">
+            ✅ Durum Yönetimi | 📞 WhatsApp Toplu Mesaj | 📨 Gelen Mesajlar
         </div>
     </div>
 
     <div class="container">
-        <!-- Sol Sidebar - Filtreler ve Reklamlar -->
+        <!-- Sol Sidebar -->
         <div class="sidebar">
             <div class="sidebar-section">
                 <div class="sidebar-title">🔍 Filtrele</div>
-                <input type="text" id="searchInput" class="filter-input" placeholder="Ad, Soyad ara..." onkeyup="applyFilters()">
+                <input type="text" id="searchInput" class="filter-input" placeholder="Ad ara..." onkeyup="applyFilters()">
                 <select id="filterClass" class="filter-select" onchange="applyFilters()">
                     <option value="">📚 Tüm Sınıflar</option>
                     <option value="5">5. Sınıf</option>
@@ -269,70 +288,118 @@
                     <option value="11">11. Sınıf</option>
                     <option value="12">12. Sınıf</option>
                 </select>
-                <button class="filter-btn" onclick="resetFilters()">Sıfırla</button>
+                <button class="btn" onclick="resetFilters()">Sıfırla</button>
             </div>
 
             <div class="sidebar-section">
-                <div class="sidebar-title">📊 İstatistikler</div>
-                <div style="font-size: 12px; line-height: 1.8;">
-                    <div>Toplam: <strong id="totalCount" style="color: #667eea;">624</strong></div>
-                    <div>Tamamlanan: <strong id="doneCount" style="color: #27ae60;">0</strong></div>
-                    <div>İletişim: <strong id="contactedCount" style="color: #0d6efd;">0</strong></div>
-                    <div>Takip: <strong id="pendingCount" style="color: #ffc107;">0</strong></div>
-                    <div>Yok: <strong id="noContactCount" style="color: #dc3545;">0</strong></div>
+                <div class="sidebar-title">📊 İstatistik</div>
+                <div class="stat">
+                    <span>Toplam:</span>
+                    <span class="stat-val" id="totalCount">624</span>
+                </div>
+                <div class="stat">
+                    <span>Tamamlandı:</span>
+                    <span class="stat-val" id="doneCount">0</span>
+                </div>
+                <div class="stat">
+                    <span>İletişim:</span>
+                    <span class="stat-val" id="contactedCount">0</span>
+                </div>
+                <div class="stat">
+                    <span>Takip:</span>
+                    <span class="stat-val" id="pendingCount">0</span>
                 </div>
             </div>
 
-            <div class="ad-box">
-                <strong>💬 WhatsApp</strong>
-                Toplu mesaj gönder
-                <button class="ad-btn" onclick="openWhatsAppPanel()">Aç</button>
+            <div class="sidebar-section">
+                <div class="sidebar-title">💬 WhatsApp Setup</div>
+                <button class="btn btn-whatsapp" onclick="alert('1. Vercel Settings\n2. Environment Variables\n3. WHATSAPP_TOKEN = (token)\n4. WHATSAPP_VERIFY_TOKEN = 123456\n5. Redeploy')">⚙️ Kurulum</button>
+                <div style="font-size: 10px; margin-top: 8px; color: #666;">
+                    Webhook URL:<br><code style="background: #f0f0f0; padding: 2px 4px; border-radius: 2px;">https://ogrenci-takip-dashboard.vercel.app/api/webhook</code>
+                </div>
             </div>
         </div>
 
         <!-- Ana Content -->
         <div class="main-content">
-            <div class="top-bar">
-                <div class="stats">
-                    <div class="stat-card">
-                        <div class="stat-value" id="displayCount">624</div>
-                        <div class="stat-label">Gösterilen</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="doneDisplay">0</div>
-                        <div class="stat-label">✅ Tamamlandı</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="contactedDisplay">0</div>
-                        <div class="stat-label">📞 İletişim</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="pendingDisplay">0</div>
-                        <div class="stat-label">⏳ Takip</div>
-                    </div>
-                </div>
-
-                <div class="tab-buttons">
+            <div class="top-controls">
+                <div class="tab-btns">
                     <button class="tab-btn active" onclick="switchTab('all')">Tümü</button>
-                    <button class="tab-btn" onclick="switchTab('done')">✅ Tamamlandı</button>
-                    <button class="tab-btn" onclick="switchTab('contacted')">📞 İletişim</button>
-                    <button class="tab-btn" onclick="switchTab('pending')">⏳ Takip</button>
-                    <button class="tab-btn" onclick="switchTab('no-contact')">❌ Yok</button>
+                    <button class="tab-btn" onclick="switchTab('done')">✅</button>
+                    <button class="tab-btn" onclick="switchTab('contacted')">📞</button>
+                    <button class="tab-btn" onclick="switchTab('pending')">⏳</button>
+                    <button class="tab-btn" onclick="switchTab('no-contact')">❌</button>
+                </div>
+                <div style="font-size: 12px; font-weight: 600; color: #667eea;">
+                    Gösterilen: <span id="displayCount">624</span>
                 </div>
             </div>
 
-            <div class="cards-container">
-                <div class="cards-grid" id="cardsGrid"></div>
-            </div>
-        </div>
+            <div class="content-area">
+                <!-- Öğrenciler Paneli -->
+                <div class="panel" style="flex: 1;">
+                    <div class="panel-title">👥 Öğrenciler</div>
+                    <div class="cards-grid" id="cardsGrid"></div>
+                </div>
 
-        <!-- Sağ Panel - Instagram -->
-        <div class="instagram-panel">
-            <div class="instagram-title">📸 Instagram Mesajları</div>
-            <div id="instagramMessages">
-                <div class="instagram-msg">
-                    <div class="instagram-from">📱 Sistem</div>
-                    <div class="instagram-text">Instagram bağlantı beklemede...</div>
+                <!-- WhatsApp Mesaj Paneli -->
+                <div class="panel right-panel">
+                    <div class="panel-title">💬 WhatsApp Toplu Mesaj</div>
+
+                    <div style="font-size: 11px; margin-bottom: 10px; color: #666;">
+                        Şablon seç veya kendi mesajını yaz
+                    </div>
+
+                    <div class="templates">
+                        <button class="template-btn" onclick="selectTemplate('Merhaba! Kurumumuza kayıt için lütfen iletişime geçin.')">
+                            👋 Selamlama
+                        </button>
+                        <button class="template-btn" onclick="selectTemplate('Kaydınız için gerekli belgeleri hazırladık. Lütfen hızlıca tamamlayın.')">
+                            📋 Evrak Hatırlatması
+                        </button>
+                        <button class="template-btn" onclick="selectTemplate('Başarılı kaydınız için teşekkürler! Eğitiminize başlamaya hazır mısınız?')">
+                            ✅ Kayıt Onayı
+                        </button>
+                        <button class="template-btn" onclick="selectTemplate('Sınıf başlıyor! Lütfen zamanında gelin.')">
+                            ⏰ Ders Başlangıç
+                        </button>
+                        <button class="template-btn" onclick="selectTemplate('Ödeme yapmayı unutmadığınızı umarız.')">
+                            💳 Ödeme Hatırlatması
+                        </button>
+                        <button class="template-btn" onclick="selectTemplate('Harika ilerleme gösteriyor! Tebrikler!')">
+                            🎉 Başarı Mesajı
+                        </button>
+                        <button class="template-btn" onclick="selectTemplate('Sorularınız varsa lütfen bize yazın.')">
+                            ❓ Destek İçin
+                        </button>
+                    </div>
+
+                    <div class="message-preview" id="messagePreview" placeholder="Mesaj önizleme..."></div>
+
+                    <textarea id="customMessage" class="filter-input" placeholder="Veya kendi mesajını yaz..." style="margin: 0; height: 60px;"></textarea>
+
+                    <div class="status-filter">
+                        <label><input type="checkbox" id="filterDone"> ✅ Tamamlananlar</label>
+                        <label><input type="checkbox" id="filterContacted"> 📞 İletişim</label>
+                        <label><input type="checkbox" id="filterPending" checked> ⏳ Takip</label>
+                    </div>
+
+                    <div class="send-section">
+                        <div class="send-info">
+                            Alıcı: <strong id="recipientCount">0</strong>
+                        </div>
+                        <button class="btn btn-whatsapp" onclick="sendBulkMessage()" style="width: 100%;">📤 Gönder</button>
+                    </div>
+
+                    <div style="margin-top: 12px; border-top: 1px solid #e9ecef; padding-top: 12px;">
+                        <div class="panel-title">📨 Gelen Mesajlar</div>
+                        <div class="incoming-msgs" id="incomingMessages">
+                            <div class="msg-item">
+                                <div class="msg-from">📱 Sistem</div>
+                                <div class="msg-text">Webhook kurulumu yapıldığında mesajlar burada gözükür...</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -348,10 +415,24 @@
             status: localStorage.getItem(`status_${s.id}`) || 'pending'
         }));
 
+        // İletişim seçenekleri
+        let selectedStatuses = ['pending'];
+
         window.onload = function() {
+            loadIncomingMessages();
             updateDashboard();
             renderCards();
         };
+
+        function selectTemplate(text) {
+            document.getElementById('customMessage').value = text;
+            document.getElementById('messagePreview').textContent = text;
+            updateRecipientCount();
+            
+            // Butonları güncelle
+            document.querySelectorAll('.template-btn').forEach(b => b.classList.remove('selected'));
+            event.target.classList.add('selected');
+        }
 
         function applyFilters() {
             const search = document.getElementById('searchInput').value.toLowerCase();
@@ -402,20 +483,14 @@
         function renderCards() {
             const html = filteredStudents.map(s => `
                 <div class="card ${s.status}" onclick="cycleStatus('${s.id}')">
-                    <div class="card-header">
-                        <div>
-                            <div class="card-name">${s.ad} ${s.soyad}</div>
-                            <div class="card-class">${s.sinif}. Sınıf</div>
-                        </div>
-                    </div>
-                    
+                    <div class="card-name">${s.ad} ${s.soyad}</div>
                     <div class="card-info">
-                        <strong>👨‍👩‍👧 Veli:</strong> ${s.veli || '-'}
-                        <br><strong>📱 Tel:</strong> ${s.veli_telefon || '-'}
-                        <br><strong>📞 Öğrenci:</strong> ${s.telefon || '-'}
+                        <div>${s.sinif}. Sınıf</div>
+                        <strong>👨‍👩‍👧:</strong> ${s.veli || '-'}<br>
+                        <strong>📱:</strong> ${s.veli_telefon || '-'}<br>
+                        <strong>📞:</strong> ${s.telefon || '-'}
                     </div>
-
-                    <div class="status-badge">${getStatusLabel(s.status)}</div>
+                    <div class="card-badge">${getStatusLabel(s.status)}</div>
                 </div>
             `).join('');
 
@@ -431,14 +506,15 @@
             localStorage.setItem(`status_${studentId}`, student.status);
             updateDashboard();
             renderCards();
+            updateRecipientCount();
         }
 
         function getStatusLabel(status) {
             const labels = {
-                pending: '⏳ Takip Edilecek',
-                contacted: '📞 İletişim Kurulan',
+                pending: '⏳ Takip',
+                contacted: '📞 İletişim',
                 done: '✅ Tamamlandı',
-                'no-contact': '❌ İletişim Yok'
+                'no-contact': '❌ Yok'
             };
             return labels[status] || status;
         }
@@ -447,37 +523,78 @@
             const doneCount = students_with_status.filter(s => s.status === 'done').length;
             const contactedCount = students_with_status.filter(s => s.status === 'contacted').length;
             const pendingCount = students_with_status.filter(s => s.status === 'pending').length;
-            const noContactCount = students_with_status.filter(s => s.status === 'no-contact').length;
 
             document.getElementById('doneCount').textContent = doneCount;
             document.getElementById('contactedCount').textContent = contactedCount;
             document.getElementById('pendingCount').textContent = pendingCount;
-            document.getElementById('noContactCount').textContent = noContactCount;
-
-            document.getElementById('doneDisplay').textContent = doneCount;
-            document.getElementById('contactedDisplay').textContent = contactedCount;
-            document.getElementById('pendingDisplay').textContent = pendingCount;
         }
 
         function updateStats() {
             const displayed = filteredStudents.length;
-            const done = filteredStudents.filter(s => s.status === 'done').length;
-            const contacted = filteredStudents.filter(s => s.status === 'contacted').length;
-            const pending = filteredStudents.filter(s => s.status === 'pending').length;
-
             document.getElementById('displayCount').textContent = displayed;
-            document.getElementById('doneDisplay').textContent = done;
-            document.getElementById('contactedDisplay').textContent = contacted;
-            document.getElementById('pendingDisplay').textContent = pending;
         }
 
-        function openWhatsAppPanel() {
-            const message = prompt('💬 Toplu WhatsApp Mesajı:\n\nSilinen öğrenciler hariç, belirtilen duruma sahip tüm öğrencilere gönderilebilir.\n\nMesajınız:');
-            if (message) {
-                const recipients = filteredStudents.filter(s => s.veli_telefon).map(s => s.veli_telefon);
-                alert(`📤 Hazır!\n\nAlıcı: ${recipients.length}\nMesaj: ${message}\n\nVercel Settings'de WHATSAPP_TOKEN ekledikten sonra gönderebilirsin!`);
+        function updateRecipientCount() {
+            const selected = [];
+            if (document.getElementById('filterDone').checked) selected.push('done');
+            if (document.getElementById('filterContacted').checked) selected.push('contacted');
+            if (document.getElementById('filterPending').checked) selected.push('pending');
+
+            selectedStatuses = selected.length ? selected : ['pending'];
+
+            const recipients = students_with_status.filter(s => 
+                selectedStatuses.includes(s.status) && s.veli_telefon
+            );
+
+            document.getElementById('recipientCount').textContent = recipients.length;
+        }
+
+        function sendBulkMessage() {
+            const message = document.getElementById('customMessage').value;
+            if (!message) {
+                alert('❌ Mesaj yazınız!');
+                return;
+            }
+
+            const recipients = students_with_status.filter(s => 
+                selectedStatuses.includes(s.status) && s.veli_telefon
+            );
+
+            if (recipients.length === 0) {
+                alert('❌ Alıcı yok!');
+                return;
+            }
+
+            alert(`✅ Hazır!\n\nAlıcılar: ${recipients.length}\n\nMesaj: "${message}"\n\nVercel'de WHATSAPP_TOKEN ekledikten sonra gönderilecek!\n\n👥 Alıcılar:\n${recipients.map(s => s.veli_telefon).join('\n').substring(0, 100)}...`);
+        }
+
+        function loadIncomingMessages() {
+            // Webhook kurulduğunda real-time mesajlar gelecek
+            // Şimdilik localStorage'dan kontrol et
+            const stored = localStorage.getItem('incomingMessages');
+            if (stored) {
+                const msgs = JSON.parse(stored);
+                const html = msgs.map(m => `
+                    <div class="msg-item">
+                        <div class="msg-from">📱 ${m.from}</div>
+                        <div class="msg-text">${m.text}</div>
+                        <div class="msg-time">${m.time}</div>
+                    </div>
+                `).join('');
+                document.getElementById('incomingMessages').innerHTML = html;
             }
         }
+
+        // Checkbox change listener
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('filterDone').addEventListener('change', updateRecipientCount);
+            document.getElementById('filterContacted').addEventListener('change', updateRecipientCount);
+            document.getElementById('filterPending').addEventListener('change', updateRecipientCount);
+            document.getElementById('customMessage').addEventListener('input', function() {
+                document.getElementById('messagePreview').textContent = this.value;
+                document.querySelectorAll('.template-btn').forEach(b => b.classList.remove('selected'));
+            });
+        });
     </script>
 </body>
 </html>
