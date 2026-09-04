@@ -27,12 +27,19 @@ module.exports = async (req, res) => {
         }
 
         const ACCESS_TOKEN = process.env.WHATSAPP_TOKEN;
-        const PHONE_NUMBER_ID = process.env.WHATSAPP_PHONE_ID || '105451023440373';
+        const PHONE_NUMBER_ID = process.env.WHATSAPP_PHONE_ID;
         const API_VERSION = process.env.WHATSAPP_API_VERSION || 'v21.0';
 
         if (!ACCESS_TOKEN) {
             return res.status(400).json({
                 error: 'WHATSAPP_TOKEN not found in environment variables',
+                status: 'error'
+            });
+        }
+
+        if (!PHONE_NUMBER_ID) {
+            return res.status(400).json({
+                error: 'WHATSAPP_PHONE_ID not found in environment variables',
                 status: 'error'
             });
         }
