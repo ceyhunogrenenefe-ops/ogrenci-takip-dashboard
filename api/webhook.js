@@ -1,54 +1,89 @@
-// api/webhook.js - DEBUG VERSION (No token check)
-export default async function handler(req, res) {
+/**
+ * api/webhook.js
+ * WhatsApp Webhook Handler for Vercel
+ */
+
+module.exports = async (req, res) => {
+    // CORS Headers
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
 
-    // Log everything
-    console.log('=== WEBHOOK DEBUG ===');
-    console.log('Method:', req.method);
-    console.log('Query:', JSON.stringify(req.query));
-    console.log('Body:', JSON.stringify(req.body));
-    console.log('==================');
+    // Preflight
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
 
-    // GET - Verification (Accept ANY token for testing)
+    // Verification Token
+    const VERIFY_TOKEN = process.env.WHATSAPP_VERIFY_TOKEN || '123456';
+
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+
+    // GET - Webhook Verification by Facebook
     if (req.method === 'GET') {
         const mode = req.query['hub.mode'];
         const token = req.query['hub.verify_token'];
         const challenge = req.query['hub.challenge'];
 
-        console.log('✅ GET VERIFICATION RECEIVED');
-        console.log('Mode:', mode);
-        console.log('Token received:', token?.substring(0, 20) + '...');
-        console.log('Challenge:', challenge);
+        console.log('GET Verification:', { mode, challenge });
 
-        // For debugging: accept any token
-        if (mode === 'subscribe' && challenge) {
-            console.log('✅ SENDING CHALLENGE BACK');
-            res.status(200).send(challenge);
-            return;
+        // Verify the token matches
+        if (mode === 'subscribe' && token === VERIFY_TOKEN) {
+            console.log('✅ Webhook verified');
+            return res.status(200).send(challenge);
         }
 
-        res.status(403).json({ error: 'Invalid request' });
-        return;
+        console.log('❌ Verification failed:', { 
+            received_token: token, 
+            expected_token: VERIFY_TOKEN 
+        });
+        return res.status(403).json({ error: 'Invalid token' });
     }
 
-    // POST - Handle messages
+    // POST - Incoming Messages/Status Updates
     if (req.method === 'POST') {
         const body = req.body;
-        console.log('📨 POST RECEIVED');
-        console.log('Object type:', body?.object);
 
-        // Accept any POST
-        res.status(200).json({ received: true });
-        return;
+        console.log('POST Webhook:', JSON.stringify(body).substring(0, 200));
+
+        // Meta format validation
+        if (body.object === 'whatsapp_business_account') {
+            try {
+                const entry = body.entry?.[0];
+                const changes = entry?.changes?.[0];
+                const value = changes?.value;
+
+                // Handle messages
+                if (value?.messages) {
+                    value.messages.forEach(msg => {
+                        console.log('📬 Message:', {
+                            from: msg.from,
+                            text: msg.text?.body,
+                            id: msg.id
+                        });
+                    });
+                }
+
+                // Handle status updates
+                if (value?.statuses) {
+                    value.statuses.forEach(status => {
+                        console.log('📤 Status:', {
+                            id: status.id,
+                            status: status.status
+                        });
+                    });
+                }
+
+                return res.status(200).json({ received: true });
+            } catch (error) {
+                console.error('Error processing webhook:', error);
+                return res.status(200).json({ received: true });
+            }
+        }
+
+        console.log('⚠️ Unknown format');
+        return res.status(200).json({ received: true });
     }
 
-    // OPTIONS
-    if (req.method === 'OPTIONS') {
-        res.status(200).end();
-        return;
-    }
-
-    res.status(405).json({ error: 'Method not allowed' });
-}
+    return res.status(405).json({ error: 'Method not allowed' });
+};
