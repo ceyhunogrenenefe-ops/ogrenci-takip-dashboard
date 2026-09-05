@@ -1,8 +1,8 @@
 node_modules/
+.next/
 .vercel/
 .env
 .env.local
 .DS_Store
-.vercel
 *.db
 *.db-journal
