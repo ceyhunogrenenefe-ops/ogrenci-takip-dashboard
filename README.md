@@ -1,60 +1,55 @@
-# Öğrenci Takip Dashboard + WhatsApp
+# Online VIP — Öğrenci Takip CRM
 
-Vercel'de çalışan öğrenci takip ve WhatsApp entegrasyonu dashboard'ı.
+Tek Next.js uygulaması: Kanban CRM + WhatsApp webhook/send.
 
-## Kurulum
+Stack: **Next.js 14** · **Prisma** · **Supabase Postgres** · **Vercel** · **GitHub**
 
-### 1. GitHub'a Push Et
+## Lokal geliştirme
+
 ```bash
-git init
-git add .
-git commit -m "Initial commit"
-git remote add origin https://github.com/KULLANICI/REPO.git
-git push -u origin main
+cp .env.example .env
+# .env içine Supabase DATABASE_URL + DIRECT_URL yaz
+
+npm install
+npm run db:push
+npm run db:seed
+npm run dev
 ```
 
-### 2. Vercel'e Deploy Et
-```bash
-npm install -g vercel
-vercel
-```
+- UI: http://localhost:3000  
+- Login: `admin@onlinevipdershane.com` / `demo1234`
 
-### 3. Environment Variable Ekle
-Vercel Dashboard'da:
-- Settings → Environment Variables
-- `WHATSAPP_TOKEN` = Senin Token'ın
+## Ortam değişkenleri
 
-## API Endpoints
+| Key | Açıklama |
+|-----|----------|
+| `DATABASE_URL` | Supabase Transaction pooler (`:6543` + `?pgbouncer=true`) |
+| `DIRECT_URL` | Supabase Direct (`:5432`) — migrate/db push |
+| `JWT_SECRET` | Session imza anahtarı |
+| `WHATSAPP_TOKEN` | Meta Cloud API token |
+| `WHATSAPP_PHONE_ID` | Phone Number ID |
+| `WHATSAPP_VERIFY_TOKEN` | Webhook verify token |
+| `WHATSAPP_API_VERSION` | Varsayılan `v21.0` |
 
-### POST /api/send-message
-WhatsApp mesaj gönder.
+## WhatsApp
 
-**Request:**
-```json
-{
-  "to": "905503034014",
-  "message": "Merhaba!"
-}
-```
+- `POST /api/send-message` — `{ to, message }`
+- `GET/POST /api/webhook` — Meta callback (URL aynı kalır)
 
-**Response:**
-```json
-{
-  "success": true,
-  "message": "Mesaj gönderildi",
-  "data": {...}
-}
-```
+## Vercel
 
-## Özellikler
+Root Directory: **`.`** (repo kökü)
 
-✅ 624 Öğrenci Yönetimi
-✅ WhatsApp Entegrasyonu
-✅ Durumları Takip
-✅ Excel Export
-✅ localStorage Desteği
-# Build: Fri Sep  4 09:56:41 UTC 2026
+Build: `prisma generate && next build` (`npm run build`)
 
+Aynı env’leri Vercel Project Settings’e ekle. Redeploy sonrası:
 
-## Build Trigger
-Deployed: $(date)
+`https://ogrenci-takip-dashboard.vercel.app`
+
+## Pipeline durumları
+
+NEW → CONTACTED → THINKING → TRIAL → WON → LOST
+
+## Roller
+
+SUPER_ADMIN · ADMIN · SALES
