@@ -1,0 +1,106 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  // Supabase: Transaction pooler (6543) → DATABASE_URL
+  // Direct (5432) → DIRECT_URL (migrate / db push)
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  SALES
+}
+
+enum Status {
+  NEW
+  CONTACTED
+  THINKING
+  TRIAL
+  WON
+  LOST
+}
+
+model Company {
+  id        String     @id @default(uuid())
+  name      String
+  users     User[]
+  customers Customer[]
+  createdAt DateTime   @default(now())
+}
+
+model User {
+  id                 String     @id @default(uuid())
+  name               String
+  email              String     @unique
+  password           String
+  role               Role
+  companyId          String
+  company            Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  stats              UserStats?
+  messages           Message[]
+  tasks              Task[]
+  assignedCustomers  Customer[] @relation("AssignedCustomers")
+  createdAt          DateTime   @default(now())
+}
+
+model UserStats {
+  id          String @id @default(uuid())
+  userId      String @unique
+  totalCalls  Int    @default(0)
+  reached     Int    @default(0)
+  conversions Int    @default(0)
+  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Customer {
+  id           String   @id @default(uuid())
+  name         String
+  phone        String
+  status       Status   @default(NEW)
+  source       String?
+  className    String?  @map("class")
+  notes        String?
+  assignedToId String?
+  assignedTo   User?    @relation("AssignedCustomers", fields: [assignedToId], references: [id])
+  companyId    String
+  company      Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  messages     Message[]
+  tasks        Task[]
+  createdAt    DateTime @default(now())
+
+  @@index([companyId, status])
+  @@index([companyId, assignedToId])
+}
+
+model Message {
+  id         String   @id @default(uuid())
+  content    String
+  type       String   @default("TEXT") // TEXT | SYSTEM
+  senderId   String?
+  customerId String
+  sender     User?    @relation(fields: [senderId], references: [id])
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@index([customerId, createdAt])
+}
+
+model Task {
+  id         String   @id @default(uuid())
+  title      String
+  dueDate    DateTime
+  status     String   @default("PENDING")
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  createdAt  DateTime @default(now())
+
+  @@index([userId, dueDate])
+  @@index([customerId])
+}

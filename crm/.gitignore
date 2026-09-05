@@ -1,0 +1,7 @@
+# Local SQLite (Prisma). For Supabase use postgres DATABASE_URL.
+.env
+.env.local
+*.db
+*.db-journal
+node_modules
+.next
